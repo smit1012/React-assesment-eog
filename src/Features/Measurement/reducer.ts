@@ -1,42 +1,42 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export type Measurement = {
-  metric: string;
-  measurements: Array<{
-    value: number;
-    at: number;
-    metric: string;
-  }>;
-};
-
-// TODO don't repeat
-interface Metric {
-  metricName: string;
-}
-
-export type ApiErrorAction = {
-  error: string;
-};
+import { IState } from '../../store';
+import { ApiErrorAction, KeyValue, Measurement, Metric } from './types';
 
 const initialState = {
+  availableMetrics: [] as Array<string>,
   measurements: [] as Array<{}>,
+  heartBeat: Date.now() as number,
   selectedMetrics: [] as Array<Metric>,
+  lastMeasurements: [] as Array<KeyValue>,
 };
 
 const slice = createSlice({
   name: 'measurement',
   initialState,
   reducers: {
-    setMetrics: (state, action: PayloadAction<Array<string>>) => {
+    setAvailableMetrics: (state, action: PayloadAction<Array<string>>) => {
+      state.availableMetrics = action.payload;
+    },
+    setSelectedMetrics: (state, action: PayloadAction<Array<Metric>>) => {
       state.selectedMetrics = action.payload.map(metric => {
-        return { metricName: metric };
+        return { metricName: metric.metricName, after: state.heartBeat - 2000000 };
       });
     },
+    setHeartBeat: (state, action: PayloadAction<number>) => {
+      state.heartBeat = action.payload;
+    },
     measurementDataRecevied: (state, action: PayloadAction<Array<Measurement>>) => {
+      state.lastMeasurements = action.payload.map(measurement => {
+        return {
+          name: measurement.metric,
+          value: measurement.measurements[measurement.measurements.length - 1].value,
+        };
+      });
+
       const trimmed = action.payload.map(measurement => {
         return {
           metric: measurement.metric,
-          measurements: measurement.measurements.slice(0, 1384),
+          measurements: measurement.measurements.slice(measurement.measurements.length - 1400),
         };
       });
 
@@ -71,3 +71,8 @@ const slice = createSlice({
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;
+
+export const measurementSelector = (state: IState) => state.measurement.measurements;
+export const lastMeasurementSelector = (state: IState) => state.measurement.lastMeasurements;
+export const selectedMetricsSelector = (state: IState) => state.measurement.selectedMetrics;
+export const availableMetricsSelector = (state: IState) => state.measurement.availableMetrics;

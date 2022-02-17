@@ -1,13 +1,31 @@
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { actions } from '../Features/Measurement/reducer';
-
-const metrics = ['flareTemp', 'casingPressure', 'injValveOpen', 'oilTemp', 'tubingPressure', 'waterTemp']; // create type and consume api
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from 'urql';
+import { actions, availableMetricsSelector } from '../Features/Measurement/reducer';
+const getMetricsQuery = `query { getMetrics }`;
 
 export default function SelectMetric() {
   const dispatch = useDispatch();
+  const metrics = useSelector(availableMetricsSelector);
+
+  const [result] = useQuery({
+    query: getMetricsQuery,
+  });
+
+  const { data, error } = result;
+
+  useEffect(() => {
+    if (error) {
+      dispatch(actions.measurementApiErrorReceived({ error: error.message }));
+      return;
+    }
+
+    if (!data) return;
+
+    dispatch(actions.setAvailableMetrics(data.getMetrics));
+  }, [dispatch, data, error]);
 
   return (
     <Autocomplete
@@ -17,7 +35,12 @@ export default function SelectMetric() {
       getOptionLabel={option => option}
       renderInput={params => <TextField {...params} variant="standard" label="Metrics" />}
       onChange={(event, value) => {
-        dispatch(actions.setMetrics(value));
+        const selectedMetrics = value.map(val => {
+          return {
+            metricName: val,
+          };
+        });
+        dispatch(actions.setSelectedMetrics(selectedMetrics));
       }}
     />
   );

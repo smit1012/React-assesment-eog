@@ -1,22 +1,19 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
 import { createClient, Provider } from 'urql';
 import SelectMetric from '../../components/SelectMetric';
-import { IState } from '../../store';
 import Graph from './Graph';
+import { serverUrl } from './../constants';
+import LastMeasurementCards from './LastMeasurementCards';
 
 const client = createClient({
-  // move to constants file
-  url: 'https://react.eogresources.com/graphql',
+  url: serverUrl,
 });
 
 const Measurements = () => {
-  const metrics = useSelector((state: IState) => state.measurement.selectedMetrics); // move to reducer
-
   return (
     <Provider value={client}>
       <SelectMetric />
-      <Graph metrics={metrics} />
+      <Graph />
+      <LastMeasurementCards />
     </Provider>
   );
 };
