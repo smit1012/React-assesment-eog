@@ -1,9 +1,11 @@
+import { makeStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from 'urql';
-import { actions, availableMetricsSelector } from '../Features/Measurement/reducer';
+import { actions, availableMetricsSelector } from './../Features/Measurement/reducer';
+
 const getMetricsQuery = `query { getMetrics }`;
 
 export default function SelectMetric() {
@@ -14,6 +16,16 @@ export default function SelectMetric() {
     query: getMetricsQuery,
   });
 
+  const useStyles = makeStyles({
+    dropdown: {
+      width: '80vh',
+      padding: '10px',
+      float: 'right'
+    },
+  });
+
+  const classes = useStyles();
+
   const { data, error } = result;
 
   useEffect(() => {
@@ -23,25 +35,27 @@ export default function SelectMetric() {
     }
 
     if (!data) return;
-
     dispatch(actions.setAvailableMetrics(data.getMetrics));
   }, [dispatch, data, error]);
+
+  const handleOnchange = (_event: React.FormEvent<HTMLInputElement>, value: string[]) => {
+    const selectedMetrics = value.map(val => {
+      return {
+        metricName: val,
+      };
+    });
+    dispatch(actions.setSelectedMetrics(selectedMetrics));
+  };
 
   return (
     <Autocomplete
       multiple
+      className={classes.dropdown}
       id="autocomplete-metrics"
       options={metrics}
       getOptionLabel={option => option}
       renderInput={params => <TextField {...params} variant="standard" label="Metrics" />}
-      onChange={(event, value) => {
-        const selectedMetrics = value.map(val => {
-          return {
-            metricName: val,
-          };
-        });
-        dispatch(actions.setSelectedMetrics(selectedMetrics));
-      }}
+      onChange={(e: any, value: string[]) => handleOnchange(e, value)}
     />
   );
 }

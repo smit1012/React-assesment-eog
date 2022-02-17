@@ -1,14 +1,13 @@
-import React from 'react';
-import 'react-toastify/dist/ReactToastify.css';
-import createStore from './store';
-import { ToastContainer } from 'react-toastify';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
 import Wrapper from './components/Wrapper';
 import Measurements from './Features/Measurement/Measurements';
-import { Provider } from 'react-redux';
+import createStore from './store';
 
 const store = createStore();
 const theme = createMuiTheme({

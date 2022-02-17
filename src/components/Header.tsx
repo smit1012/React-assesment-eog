@@ -9,6 +9,8 @@ const useStyles = makeStyles({
   grow: {
     flexGrow: 1,
   },
+  toolbar: {
+  },
 });
 
 export default () => {
@@ -17,7 +19,7 @@ export default () => {
   const name = "Smit's";
   return (
     <AppBar position="static">
-      <Toolbar>
+      <Toolbar className={classes.toolbar}>
         <Typography variant="h6" color="inherit" className={classes.grow}>
           {name} EOG React Visualization Assessment
         </Typography>

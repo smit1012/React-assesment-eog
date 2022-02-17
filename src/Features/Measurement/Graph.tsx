@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useQuery } from 'urql';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { actions, measurementSelector, selectedMetricsSelector } from './reducer';
-import { formatter, getColor, labelFormatter } from './utils';
+import { formatter, getColor, labelFormatter } from './util';
 
 const multipleMeasurementsQuery = `
 query($metrics: [MeasurementQuery]!) {
@@ -27,6 +27,7 @@ const Graph = () => {
 
   const [result] = useQuery({
     requestPolicy: 'cache-and-network',
+    pollInterval: 1300,
     query: multipleMeasurementsQuery,
     variables: {
       metrics: selectedMetrics,
@@ -57,8 +58,8 @@ const Graph = () => {
               data={measurementsData}
               margin={{
                 top: 5,
-                right: 30,
-                left: 20,
+                right: 20,
+                left: 0,
                 bottom: 5,
               }}
             >

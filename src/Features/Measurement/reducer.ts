@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { IState } from '../../store';
 import { ApiErrorAction, KeyValue, Measurement, Metric } from './types';
 
